@@ -1,4 +1,7 @@
 ---
+import Header from '@/components/Header.astro';
+import IconKeyboard from '@/components/IconKeyboard.astro';
+import Modal from '@/components/Modal.astro';
 interface Props {
 	title: string;
 }
@@ -12,16 +15,36 @@ const { title } = Astro.props;
 		<meta charset="UTF-8" />
 		<meta name="description" content="Astro description" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<script>
+			const styleDoc = document.getElementById('stylesheet') as HTMLLinkElement;
+			const favicon = document.getElementById('favicon') as HTMLLinkElement;
+			if (localStorage.getItem('themeName')) {
+				styleDoc.href = `/src/themes/${localStorage.getItem('themeName')}.css`;
+				favicon.href = `${localStorage.getItem('strokeColor')}`;
+			} else {
+				styleDoc.href = '/src/themes/discord.css';
+				favicon.href = 'data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2224%22%20height=%2224%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%2323a9d5%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%20class=%22icon%20icon-tabler%20icons-tabler-outline%20icon-tabler-keyboard%22%3E%3Cpath%20stroke=%22none%22%20d=%22M0%200h24v24H0z%22%20fill=%22none%22/%3E%3Cpath%20d=%22M2%206m0%202a2%202%200%200%201%202%20-2h16a2%202%200%200%201%202%202v8a2%202%200%200%201%20-2%202h-16a2%202%200%200%201%20-2%20-2z%22%20/%3E%3Cpath%20d=%22M6%2010l0%20.01%22%20/%3E%3Cpath%20d=%22M10%2010l0%20.01%22%20/%3E%3Cpath%20d=%22M14%2010l0%20.01%22%20/%3E%3Cpath%20d=%22M18%2010l0%20.01%22%20/%3E%3Cpath%20d=%22M6%2014l0%20.01%22%20/%3E%3Cpath%20d=%22M18%2014l0%20.01%22%20/%3E%3Cpath%20d=%22M10%2014l4%20.01%22%20/%3E%3C/svg%3E';
+			}
+		</script>
+		<link id="favicon" rel="icon" type="image/svg+xml" />
 		<meta name="generator" content={Astro.generator} />
+		<link rel="stylesheet" id="stylesheet">
 		<title>{title}</title>
 	</head>
 	<body>
-		<header></header>
+		<head>
+			<div class="container flex justify-start items-center !flex-row !mt-10">
+				<IconKeyboard/>
+				<h1 class="text-3xl">Typing game</h1>
+			</div>
+		</head>
+		<Header/>
 		<main>
 			<slot />
 		</main>
-		<footer></footer>
+		<div class="container">
+			<Modal/>
+		</div>
 	</body>
 </html>
 <style is:global>
@@ -36,20 +59,24 @@ const { title } = Astro.props;
 			rgb(var(--accent-light)) 30%,
 			white 60%
 		);
-		--bg-color: #2d394d;
-		--main-color: #ff7a90;
-		--caret-color: #ff7a90;
-		--sub-color: #4a768d;
-		--sub-alt-color: #263041;
-		--text-color: #fffaf8;
-		--error-color: #ee2a3a;
-		--error-extra-color: #f04040;
-		--colorful-error-color: #fc2032;
-		--colorful-error-extra-color: #f04040;
+	}
+
+	#favicon {
+  		stroke: var(--main-color) !important;
+	}
+
+	.container {
+		margin: 0 auto;
+		padding: 0 calc(2rem / 2);
+    	max-width: 1200px;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	body {
 		background: var(--bg-color);
+		transition: background 0.25s ease 0s, transform 0.05s ease 0s;
 	}
 
 	main {
