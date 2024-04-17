@@ -14,10 +14,16 @@ import Layout from '../layouts/Layout.astro';
 	const $accuracy = document.querySelector('#result-accuracy') as HTMLInputElement;
 	const $button = document.querySelector('#reload-button') as HTMLButtonElement;
 
-	const INITIAL_tiME = 30;
+	let INITIAL_tiME = 15;
 
 	let words = [];
 	let currentTime = INITIAL_tiME;
+
+	document.addEventListener("changetime", (data) => {
+		const time = Math.floor(data.detail.time);
+		INITIAL_tiME = time;
+		initGame();
+	})
 
 	initGame();
 	initEvents();
@@ -30,10 +36,12 @@ import Layout from '../layouts/Layout.astro';
 
 		words = INITIAl_WORDS
 		.toSorted(() => Math.random() - 0.5)
-		.slice(0, 32);
+		.slice(0, INITIAL_tiME + 5);
 		currentTime = INITIAL_tiME;
 
-		$time.textContent = currentTime.toString();
+		if (currentTime === 0) $time.style.display = 'none';
+
+		// $time.textContent = currentTime.toString();
 
 		$paragraph.innerHTML = words.map((word, index) => {
 			const letters = word.split('');
@@ -52,27 +60,28 @@ import Layout from '../layouts/Layout.astro';
 		firstWord.classList.add('active');
 		(firstWord.querySelector('letter') as HTMLElement).classList.add('active');
 
-
-
-		const intervalId = setInterval(() => {
-			currentTime--
-			$time.textContent = currentTime.toString();
-			if (currentTime === 0) {
-				clearInterval(intervalId);
-				gameOver();
-			}
-		}, 1000);
-
 	}
 
 	function initEvents() {
 		document.addEventListener('keydown' , () => {
 		  $input.focus();
 		})
-		$input.addEventListener('keydown', onKeyDown);
-		$input.addEventListener('keyup', onKeyUp);
 
-		$button.addEventListener('click', initGame)
+		$input.addEventListener('keydown', onKeyDown);
+
+		let letterPresed = false;
+		$input.addEventListener('keyup', () => {
+			onKeyUp()
+			if (!letterPresed) {
+				initTime();
+				letterPresed = true;
+			}
+		});
+
+		$button.addEventListener('click', () => {
+			initGame()
+			letterPresed = false;
+		})
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
@@ -135,13 +144,14 @@ import Layout from '../layouts/Layout.astro';
 	}
 
 	function onKeyUp() {
+
 		const $currentWord = $paragraph.querySelector('word.active') as HTMLElement;
 		const $currentLetter = $currentWord.querySelector('letter.active') as HTMLElement; 
 
 		const currentWord = $currentWord.innerText.trim();
 
 		$input.maxLength = currentWord.length;
-		console.log({value: $input.value, currentWord});
+		// console.log({value: $input.value, currentWord});
 
 		const $allLetters = $currentWord.querySelectorAll('letter');
 
@@ -166,9 +176,20 @@ import Layout from '../layouts/Layout.astro';
 			$nextActiveLetter.classList.add('active');
 		} else {
 			$currentLetter.classList.add('active', 'is-last');
-			// TODO: Game over si no hay otra palabra
+			// gameOver();
 		}
 
+	}
+
+	function initTime() {
+		const intervalId = setInterval(() => {
+			currentTime--
+			$time.textContent = currentTime.toString();
+			if (currentTime === 0) {
+				clearInterval(intervalId);
+				gameOver(); 
+			}
+		}, 1000);
 	}
 
 	function gameOver() {
@@ -186,12 +207,13 @@ import Layout from '../layouts/Layout.astro';
 
 		const wpm = correctWords * 60 / INITIAL_tiME
 		$wpm.textContent = wpm.toString();
-		$accuracy.textContent = `${accuracy.toFixed(2)}%`
+		$accuracy.textContent = `${accuracy.toFixed(2)}%`;
+		$time.innerText = INITIAL_tiME.toString();
 	}
 
 </script>
 
-<Layout title="Monkey Type Clone - Test Yout typing skills">
+<Layout title="Typing Game - Test Your typing skills">
 	<section id="game">
 		<time></time>
 		<p id="paragraph"></p>
@@ -306,7 +328,7 @@ import Layout from '../layouts/Layout.astro';
 		color: var(--main-color);
 	}
 
-	button {
+	#reload-button {
 		background: transparent;
 		border: 0;
 		margin-top: 32px;

@@ -1,0 +1,83 @@
+---
+import { themeData } from '../data/themeData'
+---
+
+<script>
+import { Modal } from 'flowbite';
+
+const $modalElement: HTMLElement = document.querySelector('#default-modal') as HTMLElement;
+const theme = localStorage.getItem('themeName');
+const $themeBtn = document.getElementById('theme-btn') as HTMLButtonElement;
+$themeBtn.textContent = theme
+? theme!.replace('_', ' ')
+: 'discord';
+
+const themes = document.querySelectorAll('#theme');
+themes.forEach(theme => {
+    theme.addEventListener('click', (e) => addThemeFile(e, theme))
+    theme.addEventListener('mouseover', (e) => addThemeFile(e, theme))
+})
+
+function addThemeFile(e: any, theme: Element){
+    const faviconStrokeColor = theme.children[1].children[0].attributes[1].value.replace('background:#', '');
+    const iconUri = `data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2224%22%20height=%2224%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%23${faviconStrokeColor}%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%20class=%22icon%20icon-tabler%20icons-tabler-outline%20icon-tabler-keyboard%22%3E%3Cpath%20stroke=%22none%22%20d=%22M0%200h24v24H0z%22%20fill=%22none%22/%3E%3Cpath%20d=%22M2%206m0%202a2%202%200%200%201%202%20-2h16a2%202%200%200%201%202%202v8a2%202%200%200%201%20-2%202h-16a2%202%200%200%201%20-2%20-2z%22%20/%3E%3Cpath%20d=%22M6%2010l0%20.01%22%20/%3E%3Cpath%20d=%22M10%2010l0%20.01%22%20/%3E%3Cpath%20d=%22M14%2010l0%20.01%22%20/%3E%3Cpath%20d=%22M18%2010l0%20.01%22%20/%3E%3Cpath%20d=%22M6%2014l0%20.01%22%20/%3E%3Cpath%20d=%22M18%2014l0%20.01%22%20/%3E%3Cpath%20d=%22M10%2014l4%20.01%22%20/%3E%3C/svg%3E`
+    const fav = document.getElementById('favicon') as HTMLLinkElement;
+    localStorage.setItem('strokeColor', iconUri)
+    const stylesheet = document.getElementById('stylesheet') as HTMLLinkElement;
+    const url = e.target?.outerText.replace(' ', '_');
+    localStorage.setItem('themeName', url);
+    stylesheet.href = `/src/themes/${url}.css`;
+    fav.href = iconUri;
+    $themeBtn.textContent = url.replace('_', ' ');
+}
+
+
+</script>
+
+<div class="flex justify-center mt-10">
+    <button data-modal-target="default-modal" data-modal-toggle="default-modal" class="flex place-content-center gap-2 w-auto text-[--sub-color]" type="button">
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 21a9 9 0 0 1 0 -18c4.97 0 9 3.582 9 8c0 1.06 -.474 2.078 -1.318 2.828c-.844 .75 -1.989 1.172 -3.182 1.172h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25" /><path d="M8.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M16.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
+        <span id="theme-btn"></span>
+    </button>
+</div>
+
+<div id="default-modal" tabindex="-1" aria-hidden="true" class="modal opacity-100 bg-transparent hidden fixed top-0 right-0 left-0 z-100 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)]">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <div class="content-modal relative bg-[--bg-color] border-4 border-[--sub-alt-color] rounded-lg opacity-100 overflow-y-auto overflow-x-hidden max-h-[780px]">
+            {
+                themeData.map((theme, i) => (
+                        <div id="theme" data-modal-toggle="default-modal" class="flex p-2 justify-between text-sm hover:text-[--bg-color] hover:bg-[--text-color]">
+                            <div class="flex items-center gap-3 text-[--sub-color]">
+                                <i></i>
+                                <div class="theme lowercase">{ theme.name }</div>
+                            </div>
+                            <div class="grid grid-flow-col place-content-center gap-2 rounded-xl pointer-events-none p-1" style={{ background: theme.bgColor }}>
+                                <div class="themeBubble" style={{background: theme.firstColor}}></div>
+                                <div class="themeBubble" style={{background: theme.secondColor}}></div>
+                                <div class="themeBubble" style={{background: theme.thirdColor}}></div>
+                            </div>
+                        </div>
+                    ))
+                }
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal {
+        transition: outline .125s;
+        font-family: Menlo, monospace;
+    }
+
+    .content-modal {
+        scrollbar-width: thin;
+        scrollbar-color: var(--sub-color) transparent;
+    }
+
+    .themeBubble {
+        width: 1em;
+        height: 1em;
+        border-radius: 100%;
+        pointer-events: none;
+    }
+</style>
