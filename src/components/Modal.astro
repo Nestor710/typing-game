@@ -26,7 +26,7 @@ function addThemeFile(e: any, theme: Element){
     const stylesheet = document.getElementById('stylesheet') as HTMLLinkElement;
     const url = e.target?.outerText.replace(' ', '_');
     localStorage.setItem('themeName', url);
-    stylesheet.href = `/src/themes/${url}.css`;
+    stylesheet.href = `/themes/${url}.css`;
     fav.href = iconUri;
     $themeBtn.textContent = url.replace('_', ' ');
 }
