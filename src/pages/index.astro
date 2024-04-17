@@ -19,7 +19,7 @@ import Layout from '../layouts/Layout.astro';
 	let words = [];
 	let currentTime = INITIAL_tiME;
 
-	document.addEventListener("changetime", (data) => {
+	document.addEventListener("changetime", (data: any) => {
 		const time = Math.floor(data.detail.time);
 		INITIAL_tiME = time;
 		initGame();
